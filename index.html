@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معالج الصور - المهندس أديب الجعشني</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script async src="https://docs.opencv.org/4.8.0/opencv.js" onload="onOpenCvReady();" type="text/javascript"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" checked />
+                <div class="slider">
+                    <div class="slider-icons">
+                        <svg class="sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0V4a1 1 0 0 1 1-1zm0 15a1 1 0 0 1 1 1v1a1 1 0 1 1-2 0v-1a1 1 0 0 1 1-1zm9-9a1 1 0 0 1-1 1h-1a1 1 0 1 1 0-2h1a1 1 0 0 1 1 1zM4 12a1 1 0 0 1-1 1H2a1 1 0 1 1 0-2h1a1 1 0 0 1 1 1zm15.7-7.3a1 1 0 0 1 0 1.4l-.7.7a1 1 0 1 1-1.4-1.4l.7-.7a1 1 0 0 1 1.4 0zM6.3 19.7a1 1 0 0 1 0-1.4l.7-.7a1 1 0 1 1 1.4 1.4l-.7.7a1 1 0 0 1-1.4 0zM4.3 4.3a1 1 0 0 1 1.4 0l.7.7a1 1 0 1 1-1.4 1.4l-.7-.7a1 1 0 0 1 0-1.4zm15.4 15.4a1 1 0 0 1-1.4 0l-.7-.7a1 1 0 1 1 1.4-1.4l.7.7a1 1 0 0 1 0 1.4zM12 6a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/></svg>
+                        <svg class="moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393 0a7.5 7.5 0 0 0 7.92 12.446a9 9 0 1 1-8.313-12.454z"/></svg>
+                    </div>
+                </div>
+            </label>
+        </div>
+        <h1>معالج الصور الاحترافي</h1>
+        <div id="loadingMessage" style="text-align: center; color: #fff;">جاري تحميل المكتبات...</div>
+        <div id="loadingMessage" style="display: none; text-align: center; margin: 20px; color: #fff; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 5px;">
+            جاري معالجة الصورة...
+        </div>
+        <div id="mainContent" style="display: none;">
+            <div class="upload-section">
+                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                <button class="upload-btn" onclick="document.getElementById('imageInput').click()">
+                    <i class="fas fa-plus-circle"></i> إضافة صورة
+                </button>
+                <div class="save-buttons">
+                    <button class="save-btn png-btn" onclick="saveImage('png')" disabled>
+                        <i class="fas fa-download"></i> حفظ PNG
+                    </button>
+                    <button class="save-btn jpg-btn" onclick="saveImage('jpg')" disabled>
+                        <i class="fas fa-download"></i> حفظ JPG
+                    </button>
+                </div>
+            </div>
+            <div class="image-container">
+                <div class="image-wrapper">
+                    <h3>الصورة الأصلية</h3>
+                    <img id="originalImage" class="preview">
+                </div>
+                <div class="image-wrapper">
+                    <h3>الصورة المعدلة</h3>
+                    <canvas id="filteredImage" class="preview"></canvas>
+                </div>
+            </div>
+            <div class="filters-section">
+                <button onclick="applyFilter('brightness')" class="filter-btn">تحسين السطوع</button>
+                <button onclick="applyFilter('contrast')" class="filter-btn">تحسين التباين</button>
+                <button onclick="applyFilter('sharpen')" class="filter-btn">توضيح الصورة</button>
+                <button onclick="applyFilter('warmth')" class="filter-btn">دفء الألوان</button>
+                <button onclick="applyFilter('cool')" class="filter-btn">برودة الألوان</button>
+                <button onclick="applyFilter('grayscale')" class="filter-btn">تدرج رمادي</button>
+                <button onclick="applyFilter('sepia')" class="filter-btn">سيبيا</button>
+                <button onclick="applyFilter('blur')" class="filter-btn">تنعيم</button>
+                <button onclick="applyFilter('vintage')" class="filter-btn">فينتاج</button>
+                <button onclick="applyFilter('vibrant')" class="filter-btn">حيوية الألوان</button>
+                <button onclick="applyFilter('fog')" class="filter-btn fog">تأثير الضباب</button>
+                <button onclick="applyFilter('frame')" class="filter-btn frame">إطار جميل</button>
+                <button onclick="applyFilter('ring-light')" class="filter-btn ring-light">إضاءة دائرية</button>
+                <button onclick="applyFilter('canon-eos')" class="filter-btn canon-eos">تأثير EOS-1D</button>
+                <button onclick="applyFilter('remove-bg')" class="filter-btn remove-bg">مسح الخلفية</button>
+                <button onclick="resetImage()" class="filter-btn reset">إعادة تعيين</button>
+                <button class="filter-btn double-exposure-btn" onclick="openDoubleExposure()">
+                    <i class="fas fa-layer-group"></i>
+                    دمج خيالي
+                </button>
+            </div>
+            <button onclick="downloadImage()" class="download-btn">تحميل الصورة</button>
+        </div>
+        <div id="doubleExposureModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeDoubleExposure()">&times;</span>
+                <h3>اختر الصورة الثانية للدمج</h3>
+                <input type="file" id="secondImage" accept="image/*" style="display: none;">
+                <button class="upload-btn secondary-upload" onclick="document.getElementById('secondImage').click()">
+                    <i class="fas fa-plus-circle"></i> اختر صورة
+                </button>
+                <div class="blend-controls">
+                    <div class="blend-option">
+                        <label>نوع الدمج:</label>
+                        <select id="blendMode">
+                            <option value="screen">Screen</option>
+                            <option value="overlay">Overlay</option>
+                            <option value="multiply">Multiply</option>
+                            <option value="lighten">Lighten</option>
+                            <option value="darken">Darken</option>
+                        </select>
+                    </div>
+                    <div class="blend-option">
+                        <label>شفافية الدمج:</label>
+                        <input type="range" id="blendOpacity" min="0" max="100" value="50">
+                        <span id="opacityValue">50%</span>
+                    </div>
+                </div>
+                <button class="apply-btn" onclick="applyDoubleExposure()">
+                    <i class="fas fa-magic"></i> تطبيق الدمج
+                </button>
+            </div>
+        </div>
+        <div class="copyright">
+            جميع الحقوق محفوظة &copy; 2024 المهندس أديب الجعشني
+            <br>
+            تطوير وتصميم معالج صور احترافي
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
